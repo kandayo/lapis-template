@@ -1,0 +1,46 @@
+version: "7.0"
+
+compose:
+  project_name: lapis-template
+  files:
+    - docker-compose.dev.yml
+
+interaction:
+  runner:
+    description: Run an arbitrary command within a container
+    service: runner
+    command: /bin/bash
+
+  luarocks:
+    description: Run luarocks commands
+    service: runner
+    command: luarocks
+
+  lapis:
+    description: Run lapis commands
+    service: runner
+    environment:
+      LAPIS_CONFIG: development
+    command: lapis
+    compose:
+      run_options: [service-ports]
+
+  tup:
+    description: Run tup commands
+    service: runner
+    command: tup
+    subcommands:
+      monitor:
+        description: Start tup monitor
+        command: tup monitor --foreground --autoupdate
+      # `--cap-add` feature is not supported for docker build. The container
+      # must be running in order to bootstrap tup.
+      bootstrap:
+        description: Bootstrap tup
+        command: bash -c "cd /home/u/tup && ./bootstrap.sh"
+
+provision:
+  - dip compose down --remove-orphans --volumes
+  - dip tup bootstrap
+  - dip luarocks install moonscript --local
+  - dip luarocks install lapis --local

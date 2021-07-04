@@ -1,0 +1,31 @@
+ARG IMAGE_VERSION=1.19.3.2-2
+FROM openresty/openresty:$IMAGE_VERSION-alpine-fat
+
+LABEL maintainer="kdy@absolab.xyz"
+
+ARG USER_ID
+RUN addgroup --gid $USER_ID u
+RUN adduser --disabled-password --gecos '' --uid $USER_ID --ingroup u u
+
+RUN apk add --update \
+  fuse \
+  fuse-dev \
+  fuse3 \
+  fuse3-dev \
+  git \
+  openssl \
+  openssl-dev \
+  pcre \
+  pcre-dev \
+  && rm -rf /var/cache/apk/*
+
+RUN git clone git://github.com/gittup/tup.git /home/u/tup
+
+RUN mkdir /home/u/.luarocks \
+ && chown -R u:u /home/u
+
+ENV PATH="/usr/local/openresty/luajit/bin:/home/u/.luarocks/bin/:/home/u/tup:${PATH}"
+
+WORKDIR /app
+
+USER u

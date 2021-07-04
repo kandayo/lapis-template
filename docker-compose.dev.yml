@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        USER_ID: "${UID:-1000}"
+    image: lapis-template-dev:1.0.0
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - /dev/fuse
+    user: "${UID:-1000}:${UID:-1000}"
+    stdin_open: true
+    tty: true
+    restart: "no"
+    ports:
+      - "8080:8080"
+    environment:
+      LUA_PATH: /usr/local/openresty/luajit/share/lua/5.1/?.lua;/usr/local/openresty/site/lualib/?.ljbc;/usr/local/openresty/site/lualib/?/init.ljbc;/usr/local/openresty/lualib/?.ljbc;/usr/local/openresty/lualib/?/init.ljbc;/usr/local/openresty/site/lualib/?.lua;/usr/local/openresty/site/lualib/?/init.lua;/usr/local/openresty/lualib/?.lua;/usr/local/openresty/lualib/?/init.lua;./?.lua;/usr/local/openresty/luajit/share/luajit-2.1.0-beta3/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/openresty/luajit/share/lua/5.1/?/init.lua;/home/u/.luarocks/share/lua/5.1/?.lua;/home/u/.luarocks/share/lua/5.1/?/init.lua
+      LUA_CPATH: /usr/local/openresty/site/lualib/?.so;/usr/local/openresty/lualib/?.so;./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/openresty/luajit/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so;/home/u/.luarocks/lib/lua/5.1/?.so
+    volumes:
+      - .:/app:cached
+      - luarocks:/home/u/.luarocks
+      - tup:/home/u/tup
+    tmpfs:
+      - /tmp
+
+volumes:
+  luarocks:
+  tup:
