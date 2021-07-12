@@ -33,6 +33,9 @@ interaction:
       monitor:
         description: Start tup monitor
         command: tup monitor --foreground --autoupdate
+      init:
+        description: Init tup
+        command: rm -rf .tup && tup init
       # `--cap-add` feature is not supported for docker build. The container
       # must be running in order to bootstrap tup.
       bootstrap:
@@ -42,5 +45,5 @@ interaction:
 provision:
   - dip compose down --remove-orphans --volumes
   - dip tup bootstrap
-  - dip luarocks install moonscript --local
-  - dip luarocks install lapis --local
+  - dip tup init
+  - dip luarocks install --local --only-deps template-dev-1.rockspec
